@@ -1,0 +1,32 @@
+name: k6 Load Tests
+
+on:
+  push:
+    branches:
+      - main  # Запускать тесты при пуше в ветку main
+  pull_request:
+    branches:
+      - main  # Запускать тесты при создании pull request в ветку main
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest  # Используем последнюю версию Ubuntu
+
+    steps:
+      # Шаг 1: Клонируем репозиторий
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Шаг 2: Устанавливаем Node.js (k6 требует Node.js для установки через npm)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18  # Указываем версию Node.js
+
+      # Шаг 3: Устанавливаем k6
+      - name: Install k6
+        run: sudo apt-get update && sudo apt-get install -y k6
+
+      # Шаг 4: Запускаем нагрузочные тесты
+      - name: Run k6 tests
+        run: k6 run scripts/load-test.js  # Укажите путь к вашему тестовому скрипту
