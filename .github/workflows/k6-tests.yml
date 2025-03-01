@@ -5,32 +5,48 @@ on:
     branches:
       - add_test
 
+
 jobs:
   k6_local_test:
-    name: k6 local test run - matrix
+    name: k6 local test run - basic example
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        test_file: [
-          'scripts/load-test.js',
-          'scripts/perfomance_tests.js',
-          'scripts/soak_tests.js',
-          'scripts/spike_tests.js',
-          'scripts/stress_tests.js'
-        ]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Run local k6 test
+      - name: Run local k6 load-test
         uses: grafana/k6-action@v0.2.0
         with:
-          filename: ${{ matrix.test_file }}
-          flags: --out json=results-${{ matrix.test_file }}.json
+          filename: scripts/load-test.js
+          flags: --out json=results-load-test.json
+      
+      - name: Run local k6 perfomance_tests
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/perfomance_tests.js
+          flags: --out json=results-perfomance-tests.json     
+
+      - name: Run local k6 soak_tests
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/soak_tests.js
+          flags: --out json=results-soak-tests.json
+        
+      - name: Run local k6 spike_tests
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/spike_tests.js
+          flags: --out json=results-spike-tests.json 
+
+      - name: Run local k6 stress_tests
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/stress_tests.js
+          flags: --out json=results-stress-tests.json 
 
       - name: Upload performance test results
         uses: actions/upload-artifact@v4
         with:
-          name: k6-reports
-          path: results-*.json
+          name: k6-report
+          path: results-stress-tests.json 
