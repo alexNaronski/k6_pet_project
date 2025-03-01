@@ -22,7 +22,7 @@ jobs:
 
       # Шаг 3: Устанавливаем k6 локально
       - name: Install k6
-        run: npm install k6
+        run: npm install
 
       # Шаг 4: Запускаем нагрузочные тесты через npx
       - name: Run k6 tests
