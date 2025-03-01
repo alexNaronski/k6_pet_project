@@ -3,38 +3,26 @@ name: k6 Load Tests
 on:
   push:
     branches:
-      - main  # Запускать тесты при пуше в ветку main
-  pull_request:
-    branches:
-      - main  # Запускать тесты при создании pull request в ветку main
+      - github_actions
+
 
 jobs:
-  load-test:
-    runs-on: ubuntu-latest  # Используем последнюю версию Ubuntu
+  k6_local_test:
+    name: k6 local test run - basic example
+    runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Клонируем репозиторий
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v1
 
-      # Шаг 2: Устанавливаем Node.js (k6 требует Node.js для установки через npm)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Run local k6 test
+        uses: grafana/k6-action@v0.2.0
         with:
-          node-version: 18  # Указываем версию Node.js
+          filename: scripts/load-test.js
+          flags: --out json=results.json
 
-      # Шаг 3: Устанавливаем k6
-      - name: Install k6
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates gnupg
-          sudo mkdir -p /etc/apt/keyrings
-          sudo gpg --no-default-keyring --keyring /etc/apt/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/etc/apt/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update
-          sudo apt-get install -y k6
-
-          
-      # Шаг 4: Запускаем нагрузочные тесты
-      - name: Run k6 tests
-        run: k6 run scripts/load-test.js  # Укажите путь к вашему тестовому скрипту
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-report
+          path: results.json
