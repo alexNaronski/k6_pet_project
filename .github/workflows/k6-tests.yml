@@ -5,6 +5,7 @@ on:
     branches:
       - github_actions
 
+
 jobs:
   load-test:
     runs-on: ubuntu-latest
@@ -14,17 +15,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Шаг 2: Устанавливаем k6 через официальный репозиторий
-      - name: Install k6
+      # Шаг 2: Устанавливаем необходимые зависимости
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ca-certificates gnupg
+          sudo apt-get install -y ca-certificates gnupg dirmngr
+
+      # Шаг 3: Добавляем GPG-ключ и репозиторий k6
+      - name: Add k6 repository
+        run: |
           sudo mkdir -p /etc/apt/keyrings
           sudo gpg --no-default-keyring --keyring /etc/apt/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
           echo "deb [signed-by=/etc/apt/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
           sudo apt-get update
-          sudo apt-get install -y k6
 
-      # Шаг 3: Запускаем нагрузочные тесты
+      # Шаг 4: Устанавливаем k6
+      - name: Install k6
+        run: sudo apt-get install -y k6
+
+      # Шаг 5: Запускаем нагрузочные тесты
       - name: Run k6 tests
         run: k6 run scripts/load-test.js
