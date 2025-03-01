@@ -1,15 +1,19 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-export const options = {
-  vus: 10, // Количество виртуальных пользователей
-  duration: '30s', // Длительность теста
+export let options = {
+  stages: [
+    { duration: '30s', target: 100 }, // Постепенное увеличение нагрузки
+    { duration: '1m', target: 500 },  // Пиковая нагрузка
+    { duration: '30s', target: 0 },   // Постепенное снижение нагрузки
+  ],
 };
 
 export default function () {
-  const res = http.get('https://test.k6.io');
+  let res = http.get('https://test.k6.io');
   check(res, {
     'status is 200': (r) => r.status === 200,
+    'response time < 500ms': (r) => r.timings.duration < 500,
   });
-  sleep(1);
+  sleep(1); // Пауза между запросами
 }

@@ -3,7 +3,7 @@ name: k6 Load Tests
 on:
   push:
     branches:
-      - github_actions
+      - add_test
 
 
 jobs:
@@ -15,14 +15,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Run local k6 test
+      - name: Run local k6 load-test
         uses: grafana/k6-action@v0.2.0
         with:
           filename: scripts/load-test.js
-          flags: --out json=results.json
+          flags: --out json=results-load-test.json
+      
+      - name: Run local k6 perfomance_tests
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/perfomance_tests.js
+          flags: --out json=results-perfomance-tests.json     
+
+      - name: Run local k6 soak_tests
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/soak_tests.js
+          flags: --out json=results-soak-tests.json
+        
+      - name: Run local k6 spike_tests
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/spike_tests.js
+          flags: --out json=results-spike-tests.json 
+
+      - name: Run local k6 stress_tests
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/stress_tests.js
+          flags: --out json=results-stress-tests.json 
 
       - name: Upload performance test results
         uses: actions/upload-artifact@v4
         with:
           name: k6-report
-          path: results.json
+          path: results-stress-tests.json 
