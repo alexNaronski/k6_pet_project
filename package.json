@@ -19,6 +19,5 @@
   },
   "homepage": "https://github.com/alexNaronski/k6_pet_project#readme",
   "devDependencies": {
-    "k6": "^0.0.0"
   }
 }
