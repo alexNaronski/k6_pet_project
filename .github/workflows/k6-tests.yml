@@ -3,11 +3,7 @@ name: k6 Load Tests
 on:
   push:
     branches:
-      - main
       - github_actions
-  pull_request:
-    branches:
-      - main
 
 jobs:
   load-test:
