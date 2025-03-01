@@ -24,6 +24,10 @@ jobs:
       - name: Install k6
         run: npm install
 
+
+      - name: Check k6 installation
+        run: npx k6 version
+
       # Шаг 4: Запускаем нагрузочные тесты через npx
       - name: Run k6 tests
         run: npx k6 run scripts/load-test.js
