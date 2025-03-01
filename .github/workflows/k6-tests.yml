@@ -7,32 +7,22 @@ on:
 
 
 jobs:
-  load-test:
+  k6_local_test:
+    name: k6 local test run - basic example
     runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Клонируем репозиторий
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v1
 
-      # Шаг 2: Устанавливаем необходимые зависимости
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates gnupg curl
+      - name: Run local k6 test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/load-test.js
+          flags: --out json=results.json
 
-      # Шаг 3: Добавляем GPG-ключ и репозиторий k6
-      - name: Add k6 repository
-        run: |
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://dl.k6.io/keys/gpg-keyring.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/k6-archive-keyring.gpg
-          echo "deb [signed-by=/etc/apt/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update
-
-      # Шаг 4: Устанавливаем k6
-      - name: Install k6
-        run: sudo apt-get install -y k6
-
-      # Шаг 5: Запускаем нагрузочные тесты
-      - name: Run k6 tests
-        run: k6 run scripts/load-test.js
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: results.json
