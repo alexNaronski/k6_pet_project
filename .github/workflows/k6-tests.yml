@@ -3,13 +3,21 @@ name: k6 Load Tests
 on:
   push:
     branches:
-      - github_actions
-
+      - add_test
 
 jobs:
   k6_local_test:
-    name: k6 local test run - basic example
+    name: k6 local test run - matrix
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_file: [
+          'scripts/load-test.js',
+          'scripts/perfomance_tests.js',
+          'scripts/soak_tests.js',
+          'scripts/spike_tests.js',
+          'scripts/stress_tests.js'
+        ]
 
     steps:
       - name: Checkout
@@ -18,11 +26,11 @@ jobs:
       - name: Run local k6 test
         uses: grafana/k6-action@v0.2.0
         with:
-          filename: scripts/load-test.js
-          flags: --out json=results.json
+          filename: ${{ matrix.test_file }}
+          flags: --out json=results-${{ matrix.test_file }}.json
 
       - name: Upload performance test results
         uses: actions/upload-artifact@v4
         with:
-          name: k6-report
-          path: results.json
+          name: k6-reports
+          path: results-*.json
